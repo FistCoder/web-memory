@@ -5,6 +5,8 @@
 
 .card{
   width: 200px;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .card-image{

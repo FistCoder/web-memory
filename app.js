@@ -7,33 +7,36 @@ const populateWithCards = (gridNode) => {
     img.src = `assets/backside.png`;
     img.classList.add("card-image");
     card.setAttribute("data-match", "false");
+    card.setAttribute("data-open", "false");
     card.id = `card${i}`;
     card.classList.add("card");
-    card.classList.add("card-closed");
     card.appendChild(img);
     gridNode.appendChild(card);
   }
 };
 
 const disableAllCards = (cards) => {
-  cards.forEach(card => {
-    card.style.pointerEvents = 'none';})
+  cards.forEach((card) => {
+    card.style.pointerEvents = "none";
+  });
 };
 const enableAllCards = (cards) => {
-  cards.forEach(card => {
-    card.style.pointerEvents = 'auto';})
+  cards.forEach((card) => {
+    card.style.pointerEvents = "auto";
+  });
 };
 
 const showCard = (cardNode, map) => {
   cardNode.children[0].src = map.get(cardNode.id);
+  cardNode.dataset.open = "true";
 };
 const hideCard = (cardNode) => {
   cardNode.children[0].src = "assets/backside.png";
+  cardNode.dataset.open = "false";
 };
 
 const compareCards = (cardNode, cardBuffer) => {
   if (cardNode.children[0].src === cardBuffer[1]) {
-    console.log("match");
     return true;
   }
   return false;
@@ -62,10 +65,10 @@ const shuffle = (array) => {
  * @param {*} array2 values
  * @return {Map} Map
  */
-const mapFromArrays = (array1, array2) => {
+const mapFromArrays = (keys, values) => {
   const map = new Map();
-  for (let i = 0; i < array1.length; i++) {
-    map.set(array1[i], array2[i]);
+  for (let i = 0; i < keys.length; i++) {
+    map.set(keys[i], values[i]);
   }
   return map;
 };
@@ -87,6 +90,18 @@ const createArrayOfRandomIDs = () => {
   return shuffle(array);
 };
 
+const checkForWin = (cards, gridNode) => {
+  let matches = 0;
+  cards.forEach((card) => {
+    if (card.dataset.match === "true") {
+      matches++;
+    }
+  });
+  if (matches === 12) {
+    gridNode.innerHTML = "<span>You Win, but no CSS for you</span>"
+  }
+};
+
 let cardBuffer = null; // Stores the ID and the src of the first card to compare
 
 const randomIDs = createArrayOfRandomIDs();
@@ -95,30 +110,58 @@ let randomMap = mapFromArrays(randomIDs, randomSrcs);
 populateWithCards(grid);
 const cards = Array.from(grid.children);
 
+// main game login
 cards.forEach((card) => {
   card.addEventListener("click", () => {
-    if (!cardBuffer) {
+    // if 1st card and
+    // its not an already matched card and
+    // the card wasn't recently open
+    if (
+      !cardBuffer &&
+      card.dataset.match === "false" &&
+      card.dataset.open === "false"
+    ) {
       showCard(card, randomMap);
       cardBuffer = [card.id, card.children[0].src];
-    } else {
+
+      // if 2nd card and
+      // its not an already matched card and
+      // the card wasn't recently open
+    } else if (
+      cardBuffer &&
+      card.dataset.match === "false" &&
+      card.dataset.open === "false"
+    ) {
       showCard(card, randomMap);
       disableAllCards(cards);
+
+      // 1s timeout to  let the user see which cards he chose
       setTimeout(() => {
         if (compareCards(card, cardBuffer)) {
+          // If matches
+
+          // Set the second card data match to true
           card.dataset.match = "true";
 
-          // On récupère l'index de la carte dans le buffer
+          // Take the card index from the buffer
+          // set first card data match to true
           let index = parseInt(cardBuffer[0].replace("card", ""));
           cards[index - 1].dataset.match = "true";
         } else {
+          // If doesn't match
+
+          // hide second card
           hideCard(card);
-          console.log(card);
+
+          // hide first card
           let index = parseInt(cardBuffer[0].replace("card", ""));
-          console.log(cards[index - 1]);
           hideCard(cards[index - 1]);
         }
+        // clean the card buffer to be ready for next pair
         cardBuffer = null;
+
         enableAllCards(cards);
+        checkForWin(cards, grid);
       }, 1000);
     }
   });
