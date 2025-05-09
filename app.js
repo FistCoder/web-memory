@@ -1,4 +1,10 @@
 const grid = document.querySelector("#grid");
+
+/**
+ * Populates a node with 12 cards and 
+ * appends a img with src to the cards
+ * @param {HTMLElement} gridNode
+ */
 const populateWithCards = (gridNode) => {
   for (let i = 1; i <= 12; i++) {
     const card = document.createElement("div");
@@ -14,26 +20,50 @@ const populateWithCards = (gridNode) => {
   }
 };
 
+/**
+ * Disables click events on all elements of a HTMLCollection
+ * @param {HTMLCollection} cards
+ */
 const disableAllCards = (cards) => {
   cards.forEach((card) => {
     card.style.pointerEvents = "none";
   });
 };
+/**
+ * Enables click events on all elements of a HTMLCollection
+ * @param {HTMLCollection} cards
+ */
 const enableAllCards = (cards) => {
   cards.forEach((card) => {
     card.style.pointerEvents = "auto";
   });
 };
 
+/**
+ * Opens up a card by changing it's source and dataset
+ * @param {*} cardNode the card with a img Node inside
+ * @param {*} map a map with the card id as key and the source for the image as value
+ */
 const showCard = (cardNode, map) => {
   cardNode.children[0].src = map.get(cardNode.id);
   cardNode.dataset.open = "true";
 };
+/**
+ * Closes a card by changing its source and dataset
+ * @param {*} cardNode the card with a img Node inside
+ */
 const hideCard = (cardNode) => {
   cardNode.children[0].src = "assets/backside.png";
   cardNode.dataset.open = "false";
 };
 
+/**
+ * Compares 2 cards by comparing the 
+ * sources of the images inside
+ * @param {*} cardNode 2st card
+ * @param {*} cardBuffer 1st card
+ * @return {boolean}  
+ */
 const compareCards = (cardNode, cardBuffer) => {
   if (cardNode.children[0].src === cardBuffer[1]) {
     return true;
@@ -72,6 +102,13 @@ const mapFromArrays = (keys, values) => {
   return map;
 };
 
+/**
+ * Creates an array with the leength of 12
+ * Inside are 6 different image sources 
+ * each source is duplicated
+ * The array is shuffled
+ * @return {array} Shuffled array  
+ */
 const createArrayOfRandomSrcs = () => {
   const array = [];
   for (let i = 1; i <= 6; i++) {
@@ -81,6 +118,12 @@ const createArrayOfRandomSrcs = () => {
   return shuffle(array);
 };
 
+/**
+ * Creates an array with the length of 12
+ * Inside are 12 unique card ids 
+ * The array is shuffled
+ * @return {array} Shuffled array  
+ */
 const createArrayOfRandomIDs = () => {
   const array = [];
   for (let i = 1; i <= 12; i++) {
@@ -89,6 +132,12 @@ const createArrayOfRandomIDs = () => {
   return shuffle(array);
 };
 
+/**
+ * Checks for win and 
+ * sets the end screen
+ * @param {Array} cards an array of cards
+ * @param {HTMLElement} gridNode The grid container
+ */
 const checkForWin = (cards, gridNode) => {
   let matches = 0;
   cards.forEach((card) => {
