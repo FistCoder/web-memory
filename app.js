@@ -1,5 +1,4 @@
 const grid = document.querySelector("#grid");
-
 const populateWithCards = (gridNode) => {
   for (let i = 1; i <= 12; i++) {
     const card = document.createElement("div");
@@ -166,3 +165,9 @@ cards.forEach((card) => {
     }
   });
 });
+
+onkeydown = event => {
+  if(event.code === "Space"){
+    window.location.reload()
+  }
+}
